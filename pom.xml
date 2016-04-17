@@ -227,7 +227,9 @@
                 </pluginManagement>
         </build>
 
-        <modules></modules>
+        <modules>
+                <module>communication</module>
+        </modules>
 
         <!-- Deployment Profiles -->
         <profiles>

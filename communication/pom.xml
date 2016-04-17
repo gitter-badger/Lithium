@@ -17,48 +17,37 @@
         <name>Lithium Communications</name>
 
         <!-- Dependencies -->
-        <dependencyManagement>
-                <dependencies>
-                        <!-- Communication -->
-                        <dependency>
-                                <groupId>io.netty</groupId>
-                                <artifactId>netty-buffer</artifactId>
-                                <version>5.0.0.Alpha2</version>
-                        </dependency>
-                        <dependency>
-                                <groupId>io.netty</groupId>
-                                <artifactId>netty-codec</artifactId>
-                                <version>5.0.0.Alpha2</version>
-                        </dependency>
-                        <dependency>
-                                <groupId>io.netty</groupId>
-                                <artifactId>netty-handler</artifactId>
-                                <version>5.0.0.Alpha2</version>
-                        </dependency>
+        <dependencies>
+                <!-- Communication -->
+                <dependency>
+                        <groupId>io.netty</groupId>
+                        <artifactId>netty-buffer</artifactId>
+                </dependency>
+                <dependency>
+                        <groupId>io.netty</groupId>
+                        <artifactId>netty-codec</artifactId>
+                </dependency>
+                <dependency>
+                        <groupId>io.netty</groupId>
+                        <artifactId>netty-handler</artifactId>
+                </dependency>
 
-                        <!-- Java -->
-                        <dependency>
-                                <groupId>com.google.code.findbugs</groupId>
-                                <artifactId>jsr305</artifactId>
-                                <version>3.0.1</version>
-                                <scope>provided</scope>
-                        </dependency>
+                <!-- Java -->
+                <dependency>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>jsr305</artifactId>
+                </dependency>
 
-                        <!-- Test Dependencies -->
-                        <dependency>
-                                <groupId>junit</groupId>
-                                <artifactId>junit</artifactId>
-                                <version>4.12</version>
-                                <scope>test</scope>
-                        </dependency>
-                        <dependency>
-                                <groupId>org.mockito</groupId>
-                                <artifactId>mockito-core</artifactId>
-                                <version>2.0.41-beta</version>
-                                <scope>test</scope>
-                        </dependency>
-                </dependencies>
-        </dependencyManagement>
+                <!-- Test Dependencies -->
+                <dependency>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
+                </dependency>
+                <dependency>
+                        <groupId>org.mockito</groupId>
+                        <artifactId>mockito-core</artifactId>
+                </dependency>
+        </dependencies>
 
         <!-- Build Settings -->
         <build>

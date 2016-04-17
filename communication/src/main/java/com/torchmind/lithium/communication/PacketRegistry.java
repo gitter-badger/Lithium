@@ -33,6 +33,17 @@ import java.util.function.Consumer;
 public interface PacketRegistry {
 
         /**
+         * Creates a new default packet registry builder instance which is capable of creating class-name based
+         * registries.
+         *
+         * @return a reference to the newly created builder.
+         */
+        @Nonnull
+        static Builder builder() {
+                return new ClassNamePacketRegistry.Builder();
+        }
+
+        /**
          * Creates a new builder instance which is aware of the configuration of this packet registry at the moment
          * of invocation.
          *

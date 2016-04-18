@@ -317,6 +317,7 @@ public interface Buffer {
          *
          * @throws IndexOutOfBoundsException when there is not enough data within the buffer to retrieve a value of this type.
          */
+        @Nonnegative
         long readUnsignedInteger() throws IndexOutOfBoundsException;
 
         /**
@@ -327,6 +328,7 @@ public interface Buffer {
          *
          * @throws IndexOutOfBoundsException when there is not enough data within the buffer to retrieve a value of this type.
          */
+        @Nonnegative
         long readUnsignedLong() throws IndexOutOfBoundsException;
 
         /**

@@ -1,9 +1,13 @@
 package com.torchmind.lithium.communication;
 
+import com.torchmind.lithium.communication.storage.StorageValue;
 import io.netty.buffer.ByteBuf;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -30,6 +34,21 @@ class ByteBufWrapperBuffer implements Buffer {
         @Override
         public ByteBuf getBuffer() {
                 return this.buf;
+        }
+
+        /**
+         * Retrieves a method handle capable of creating instances of a certain type by means of type specific
+         * de-serialization.
+         *
+         * @param type a type.
+         * @return a method handle.
+         *
+         * @throws NoSuchMethodException  when no de-serializer method was found.
+         * @throws IllegalAccessException when the de-serializer method is inaccessible.
+         */
+        @Nonnull
+        private MethodHandle getDeserializationConstructor(@Nonnull Class<?> type) throws IllegalAccessException, NoSuchMethodException {
+                return MethodHandles.publicLookup().findConstructor(type, MethodType.methodType(void.class, Buffer.class));
         }
 
         /**
@@ -161,6 +180,23 @@ class ByteBufWrapperBuffer implements Buffer {
         @Override
         public short readShort() throws IndexOutOfBoundsException {
                 return this.buf.readShort();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        @Override
+        @SuppressWarnings("unchecked")
+        public <V extends StorageValue> V readStorageValue(@Nonnull Class<V> type) {
+                try {
+                        MethodHandle handle = this.getDeserializationConstructor(type);
+                        return (V) handle.invokeExact(this);
+                } catch (NoSuchMethodException | IllegalAccessException ex) {
+                        throw new IllegalArgumentException("Invalid storage value implementation: Cannot access de-serialization constructor", ex);
+                } catch (Throwable ex) {
+                        throw new IllegalStateException("Could not decode storage value: " + ex.getMessage(), ex);
+                }
         }
 
         /**
@@ -351,6 +387,22 @@ class ByteBufWrapperBuffer implements Buffer {
         @Override
         public Buffer writeShort(short value) {
                 this.buf.writeShort(value);
+                return this;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        @Override
+        public Buffer writeStorageValue(@Nonnull StorageValue value) {
+                try {
+                        this.getDeserializationConstructor(value.getClass());
+                } catch (NoSuchMethodException | IllegalAccessException ex) {
+                        throw new IllegalArgumentException("Invalid storage value implementation: Cannot access de-serialization constructor", ex);
+                }
+
+                value.write(this);
                 return this;
         }
 

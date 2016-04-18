@@ -1,5 +1,6 @@
 package com.torchmind.lithium.communication;
 
+import com.torchmind.lithium.communication.storage.StorageValue;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
@@ -274,6 +275,20 @@ public interface Buffer {
         short readShort() throws IndexOutOfBoundsException;
 
         /**
+         * Retrieves a special storage value from this buffer using its encoded form and increases its reader index by
+         * the amount required to store the value.
+         *
+         * @param type a reference to the storage value implementation type.
+         * @param <V>  a storage value type.
+         * @return a reference to the retrieved value.
+         *
+         * @throws IllegalArgumentException when the supplied type does not provide at least one constructor for decoding.
+         * @throws IllegalStateException    when the supplied type throws an error while attempting to call its de-serialization constructor.
+         */
+        @Nonnull
+        <V extends StorageValue> V readStorageValue(@Nonnull Class<V> type) throws IllegalArgumentException, IllegalStateException;
+
+        /**
          * Retrieves a single string from the buffer and increases its reader index by the amount required to represent
          * the encoded string length as well as its actual data.
          *
@@ -490,6 +505,20 @@ public interface Buffer {
          */
         @Nonnull
         Buffer writeShort(short value);
+
+        /**
+         * Writes a special storage value into the buffer using its encoded form and increases its writer index by the
+         * amount required to store the value.
+         *
+         * This method returns a reference to its parent instance and is thus chain-able.
+         *
+         * @param value a storage value.
+         * @return a reference to this buffer.
+         *
+         * @throws IllegalArgumentException when the supplied type does not provide at least one constructor for decoding.
+         */
+        @Nonnull
+        Buffer writeStorageValue(@Nonnull StorageValue value) throws IllegalArgumentException;
 
         /**
          * Writes a single string value in its encoded form into this buffer and increases its writer index by the

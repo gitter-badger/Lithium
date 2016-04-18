@@ -1,6 +1,8 @@
 package com.torchmind.lithium.communication;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.Unpooled;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -25,6 +27,88 @@ import java.util.UUID;
  * @author <a href="mailto:johannesd@torchmind.com">Johannes Donath</a>
  */
 public interface Buffer {
+
+        /**
+         * Allocates a new native buffer without any specific bounds and without a specific allocation context.
+         *
+         * @return a reference to the newly created buffer.
+         */
+        @Nonnull
+        static Buffer alloc() {
+                return new ByteBufWrapperBuffer(Unpooled.directBuffer());
+        }
+
+        /**
+         * Allocates a new native buffer with an initial capacity and without a specific allocation context.
+         *
+         * Note: This method is to be preferred over {@link #alloc()} as it may provide performance improvement due to
+         * the reduced amount of memory allocations caused when writing data.
+         *
+         * @param initialCapacity an initial capacity (in bytes).
+         * @return a reference to the newly created buffer.
+         */
+        @Nonnull
+        static Buffer alloc(@Nonnegative int initialCapacity) {
+                return new ByteBufWrapperBuffer(Unpooled.directBuffer(initialCapacity));
+        }
+
+        /**
+         * Allocates a new native buffer with an initial capacity, a maximum capacity and without a specific allocation
+         * context.
+         *
+         * Note: This method is to be preferred over {@link #alloc()} as it may provide performance improvement due to
+         * the reduced amount of memory allocations caused when writing data.
+         *
+         * @param initialCapacity an initial capacity (in bytes).
+         * @param maxCapacity     a maximum capacity (in bytes).
+         * @return a reference to the newly created buffer.
+         */
+        @Nonnull
+        static Buffer alloc(@Nonnegative int initialCapacity, @Nonnegative int maxCapacity) {
+                return new ByteBufWrapperBuffer(Unpooled.directBuffer(initialCapacity, maxCapacity));
+        }
+
+        /**
+         * Allocates a new native buffer using a specific allocator without any specific bounds.
+         *
+         * @param allocator an allocator.
+         * @return a reference to the newly created buffer.
+         */
+        @Nonnull
+        static Buffer alloc(@Nonnull ByteBufAllocator allocator) {
+                return new ByteBufWrapperBuffer(allocator.directBuffer());
+        }
+
+        /**
+         * Allocates a new native buffer using a specific allocator with an initial capacity.
+         *
+         * Note: This method is to be preferred over {@link #alloc(ByteBufAllocator)} as it may provide performance
+         * improvement due to the reduced amount of memory allocations caused when writing data.
+         *
+         * @param allocator       an allocator.
+         * @param initialCapacity an initial capacity (in bytes).
+         * @return a reference to the newly created buffer.
+         */
+        @Nonnull
+        static Buffer alloc(@Nonnull ByteBufAllocator allocator, @Nonnegative int initialCapacity) {
+                return new ByteBufWrapperBuffer(allocator.directBuffer(initialCapacity));
+        }
+
+        /**
+         * Allocates a new native buffer using a specific allocator with an initial and maximum capacity.
+         *
+         * Note: This method is to be preferred over {@link #alloc(ByteBufAllocator)} as it may provide performance
+         * improvement due to the reduced amount of memory allocations caused when writing data.
+         *
+         * @param allocator       an allocator.
+         * @param initialCapacity an initial capacity (in bytes)
+         * @param maxCapacity     a maximum capacity (in bytes).
+         * @return a reference to the newly created buffer.
+         */
+        @Nonnull
+        static Buffer alloc(@Nonnull ByteBufAllocator allocator, @Nonnegative int initialCapacity, @Nonnegative int maxCapacity) {
+                return new ByteBufWrapperBuffer(allocator.directBuffer(initialCapacity, maxCapacity));
+        }
 
         /**
          * Retrieves the backing buffer implementation.
@@ -290,6 +374,17 @@ public interface Buffer {
          */
         @Nonnull
         Buffer setWriterIndex(int index);
+
+        /**
+         * Creates a wrapper around the specified {@link ByteBuf} buffer.
+         *
+         * @param buffer a buffer to wrap.
+         * @return a reference to the wrapped buffer.
+         */
+        @Nonnull
+        static Buffer wrap(@Nonnull ByteBuf buffer) {
+                return new ByteBufWrapperBuffer(buffer);
+        }
 
         /**
          * Writes a buffer and thus all of its contents into this buffer and increases its writer index by the amount

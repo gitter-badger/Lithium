@@ -150,6 +150,22 @@ public interface Buffer {
         int getWriterIndex();
 
         /**
+         * Checks whether an integer has been fully written to this buffer and may thus be read or whether there is
+         * more data required based on the indication given by the Base-128 VarInt standard.
+         *
+         * @return true if fully available, false otherwise.
+         */
+        boolean isIntegerAvailable();
+
+        /**
+         * Checks whether a long has been fully written to this buffer and may thus be read or whether there is more
+         * data required based on the indication given by the Base-128 VarInt standard.
+         *
+         * @return true if fully available, false otherwise.
+         */
+        boolean isLongAvailable();
+
+        /**
          * Checks whether the underlying buffer is utilizing native components to provide efficient methods of storing,
          * modifying and retrieving data utilizing this interface.
          *

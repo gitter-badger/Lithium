@@ -80,8 +80,55 @@ class ByteBufWrapperBuffer implements Buffer {
          * {@inheritDoc}
          */
         @Override
+        public boolean isIntegerAvailable() {
+                return this.isVarIntAvailable(5);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isLongAvailable() {
+                return this.isVarIntAvailable(10);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isNative() {
                 return this.buf.isDirect();
+        }
+
+        /**
+         * Checks whether a VarInt of a specific maximum length is available within the buffer ath the point of
+         * invocation.
+         *
+         * @param maxLength a maximum amount of bytes to be present within the VarInt.
+         * @return true if fully available, false otherwise.
+         */
+        public boolean isVarIntAvailable(int maxLength) {
+                this.markReaderIndex();
+
+                try {
+                        byte current;
+
+                        for (int i = 0; i < maxLength; ++i) {
+                                if (!this.buf.isReadable(1)) {
+                                        return false;
+                                }
+
+                                current = this.readByte();
+
+                                if ((current & 0x80) != 0x80) {
+                                        return true;
+                                }
+                        }
+
+                        return true;
+                } finally {
+                        this.resetReaderIndex();
+                }
         }
 
         /**

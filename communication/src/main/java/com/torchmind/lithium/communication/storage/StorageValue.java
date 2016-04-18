@@ -3,6 +3,7 @@ package com.torchmind.lithium.communication.storage;
 import com.torchmind.lithium.communication.Buffer;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 
 /**
  * <strong>Storage Value</strong>
@@ -23,6 +24,7 @@ public interface StorageValue {
          * Writes the data represented by this value into a buffer using an implementation specific binary encoding.
          *
          * @param buffer a buffer to write all data into.
+         * @throws IOException when serializing the storage value fails.
          */
-        void write(@Nonnull Buffer buffer);
+        void write(@Nonnull Buffer buffer) throws IOException;
 }

@@ -429,7 +429,7 @@ class ByteBufWrapperBuffer implements Buffer {
          */
         @Nonnull
         @Override
-        public Buffer writeStorageValue(@Nonnull StorageValue value) {
+        public Buffer writeStorageValue(@Nonnull StorageValue value) throws IOException {
                 try {
                         this.getDeserializationConstructor(value.getClass());
                 } catch (NoSuchMethodException | IllegalAccessException ex) {

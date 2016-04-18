@@ -547,9 +547,10 @@ public interface Buffer {
          * @return a reference to this buffer.
          *
          * @throws IllegalArgumentException when the supplied type does not provide at least one constructor for decoding.
+         * @throws IOException              when the supplied storage value implementation type reports an error during serialization.
          */
         @Nonnull
-        Buffer writeStorageValue(@Nonnull StorageValue value) throws IllegalArgumentException;
+        Buffer writeStorageValue(@Nonnull StorageValue value) throws IllegalArgumentException, IOException;
 
         /**
          * Writes a single string value in its encoded form into this buffer and increases its writer index by the

@@ -298,11 +298,12 @@ public interface Buffer {
          * @param <V>  a storage value type.
          * @return a reference to the retrieved value.
          *
-         * @throws IllegalArgumentException when the supplied type does not provide at least one constructor for decoding.
-         * @throws IllegalStateException    when the supplied type throws an error while attempting to call its de-serialization constructor.
+         * @throws IllegalArgumentException  when the supplied type does not provide at least one constructor for decoding.
+         * @throws IllegalStateException     when the supplied type throws an error while attempting to call its de-serialization constructor.
+         * @throws IndexOutOfBoundsException when there is not enough data left within this buffer to de-serialize the supplied storage type.
          */
         @Nonnull
-        <V extends StorageValue> V readStorageValue(@Nonnull Class<V> type) throws IllegalArgumentException, IllegalStateException;
+        <V extends StorageValue> V readStorageValue(@Nonnull Class<V> type) throws IllegalArgumentException, IllegalStateException, IndexOutOfBoundsException;
 
         /**
          * Retrieves a single string from the buffer and increases its reader index by the amount required to represent

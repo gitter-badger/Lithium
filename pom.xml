@@ -105,6 +105,13 @@
                                 <scope>provided</scope>
                         </dependency>
 
+                        <!-- Logging -->
+                        <dependency>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>slf4j-api</artifactId>
+                                <version>1.7.21</version>
+                        </dependency>
+
                         <!-- Test Dependencies -->
                         <dependency>
                                 <groupId>junit</groupId>

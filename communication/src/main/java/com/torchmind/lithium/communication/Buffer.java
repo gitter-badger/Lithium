@@ -421,6 +421,20 @@ public interface Buffer {
         }
 
         /**
+         * Passes this buffer to a consumer of some kind in order to delegate the actual writing process to another
+         * type.
+         *
+         * This method returns a reference to its parent instance and is thus chain-able.
+         *
+         * @param consumer a consumer.
+         * @return a reference to this buffer.
+         *
+         * @throws IOException when the consumer reports an error while writing a set of data.
+         */
+        @Nonnull
+        Buffer write(@Nonnull BufferConsumer consumer) throws IOException;
+
+        /**
          * Writes a buffer and thus all of its contents into this buffer and increases its writer index by the amount
          * required to store its length (as a Base-128 VarInt) as well as the passed data itself.
          *
@@ -620,4 +634,15 @@ public interface Buffer {
          */
         @Nonnull
         Buffer writeUnsignedLong(@Nonnegative long value);
+
+        /**
+         * <strong>Buffer Consumer</strong>
+         *
+         * Provides a consumer which accepts a Buffer instance and is able to report IO errors when an unexpected state
+         * occurs.
+         */
+        @FunctionalInterface
+        interface BufferConsumer {
+                void accept(@Nonnull Buffer buffer) throws IOException;
+        }
 }

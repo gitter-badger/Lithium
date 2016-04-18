@@ -334,6 +334,16 @@ class ByteBufWrapperBuffer implements Buffer {
          */
         @Nonnull
         @Override
+        public Buffer write(@Nonnull BufferConsumer consumer) throws IOException {
+                consumer.accept(this);
+                return this;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        @Override
         public Buffer writeBuffer(@Nonnull Buffer buffer) {
                 this.writeUnsignedInteger(buffer.getReadableBytes());
                 return this.writeBuffer(buffer.getBuffer());
@@ -410,8 +420,7 @@ class ByteBufWrapperBuffer implements Buffer {
                         throw new IllegalArgumentException("Invalid packet implementation: Could not access de-serialization constructor", ex);
                 }
 
-                packet.write(this);
-                return this;
+                return this.write(packet::write);
         }
 
         /**
@@ -436,8 +445,7 @@ class ByteBufWrapperBuffer implements Buffer {
                         throw new IllegalArgumentException("Invalid storage value implementation: Cannot access de-serialization constructor", ex);
                 }
 
-                value.write(this);
-                return this;
+                return this.write(value::write);
         }
 
         /**

@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -172,6 +173,23 @@ class ByteBufWrapperBuffer implements Buffer {
         public long readLong() throws IndexOutOfBoundsException {
                 long tmp = this.readUnsignedLong();
                 return (tmp >>> 1) ^ (tmp << 63);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        @Override
+        @SuppressWarnings("unchecked")
+        public <P extends Packet> P readPacketData(@Nonnull Class<P> type) throws IllegalArgumentException, IllegalStateException, IndexOutOfBoundsException {
+                try {
+                        MethodHandle handle = this.getDeserializationConstructor(type);
+                        return (P) handle.invokeExact(this);
+                } catch (NoSuchMethodException | IllegalAccessException ex) {
+                        throw new IllegalArgumentException("Invalid packet implementation: Could not access de-serialization constructor", ex);
+                } catch (Throwable ex) {
+                        throw new IllegalStateException("Cannot de-serialize packet: " + ex.getMessage(), ex);
+                }
         }
 
         /**
@@ -378,6 +396,22 @@ class ByteBufWrapperBuffer implements Buffer {
         @Override
         public Buffer writeLong(long value) {
                 return this.writeUnsignedLong(((value << 1) ^ (value >>> 63)));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        @Override
+        public Buffer writePacketData(@Nonnull Packet packet) throws IllegalArgumentException, IOException {
+                try {
+                        this.getDeserializationConstructor(packet.getClass());
+                } catch (NoSuchMethodException | IllegalAccessException ex) {
+                        throw new IllegalArgumentException("Invalid packet implementation: Could not access de-serialization constructor", ex);
+                }
+
+                packet.write(this);
+                return this;
         }
 
         /**

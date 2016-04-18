@@ -7,6 +7,7 @@ import io.netty.buffer.Unpooled;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
@@ -266,6 +267,21 @@ public interface Buffer {
         long readLong() throws IndexOutOfBoundsException;
 
         /**
+         * Reads the data contained within a single packet from the buffer and increases its reader index by the amount
+         * required to store the value.
+         *
+         * @param type a reference to the expected packet implementation type.
+         * @param <P>  a packet type.
+         * @return a reference to the decoded packet.
+         *
+         * @throws IllegalArgumentException  when the supplied packet implementation type does not provide at least one de-serialization constructor.
+         * @throws IllegalStateException     when the supplied packet implementation type reports an error upon de-serialization.
+         * @throws IndexOutOfBoundsException when the buffer does not have enough remaining data to read from.
+         */
+        @Nonnull
+        <P extends Packet> P readPacketData(@Nonnull Class<P> type) throws IllegalArgumentException, IllegalStateException, IndexOutOfBoundsException;
+
+        /**
          * Retrieves a single short from the buffer and increases its reader index by two bytes.
          *
          * @return a short.
@@ -494,6 +510,21 @@ public interface Buffer {
          */
         @Nonnull
         Buffer writeLong(long value);
+
+        /**
+         * Writes the data contained within a single packet into the buffer and increases its writer index by the amount
+         * required to store the value.
+         *
+         * This method returns a reference to its parent instance and is thus chain-able.
+         *
+         * @param packet a packet.
+         * @return a reference to this buffer.
+         *
+         * @throws IllegalArgumentException when the supplied packet implementation type does not provide at least one de-serialization constructor.
+         * @throws IOException              when the packet reports an error while attempting to encode its data.
+         */
+        @Nonnull
+        Buffer writePacketData(@Nonnull Packet packet) throws IllegalArgumentException, IOException;
 
         /**
          * Writes a single short value into the buffer and increases its writer index by two.

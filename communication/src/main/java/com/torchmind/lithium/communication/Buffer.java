@@ -474,6 +474,17 @@ public interface Buffer {
         }
 
         /**
+         * Wraps an array of bytes into a new buffer.
+         *
+         * @param array an array of bytes.
+         * @return a reference to the newly created buffer.
+         */
+        @Nonnull
+        static Buffer wrap(@Nonnull byte[] array) {
+                return wrap(Unpooled.wrappedBuffer(array));
+        }
+
+        /**
          * Passes this buffer to a consumer of some kind in order to delegate the actual writing process to another
          * type.
          *

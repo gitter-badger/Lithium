@@ -12,11 +12,16 @@ import javax.annotation.Nonnegative;
  * <strong>Implementation Notes:</strong>
  * While this interface does not declare any special constructors due to the limitations of the Java programming
  * language, implementations are required to provide a de-serialization constructor which accepts an instance of
- * {@link Buffer} as well as a {@link short} value which represents the TTL.
+ * {@link Buffer}, a {@link Short} value which represents the TTL and a {@link java.util.UUID} value which represents
+ * the packet identifier.
+ *
+ * Additionally instances of registered packet types which implement this interface will be instantiated within the
+ * network backend and thus may not call any methods which aren't sufficiently thread safe from within their constructor
+ * or {@link #write(Buffer)} method.
  *
  * For example:
  * <pre>
- *         public MyPacket(@Nonnegative short ttl, @Nonnull Buffer buffer) {
+ *         public MyPacket(@Nonnull UUID identifier, @Nonnegative short ttl, @Nonnull Buffer buffer) {
  *              ...
  *         }
  * </pre>

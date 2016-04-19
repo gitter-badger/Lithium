@@ -16,8 +16,8 @@ import java.util.UUID;
  *
  * <strong>Implementation Notes:</strong>
  * While this interface only dictates the existence of an {@link #write(Buffer)} method, all implementations are
- * required to provide at least one publicly visible constructor which accepts an instance of {@link Buffer} which is
- * capable of decoding the binary information within a serialized packet.
+ * required to provide at least one publicly visible constructor which accepts an instance of {@link Buffer} as well as
+ * {@link UUID} which is capable of decoding the binary information within a serialized packet.
  *
  * Additionally instances of registered packet types which implement this interface will be instantiated within the
  * network backend and thus may not call any methods which aren't sufficiently thread safe from within their constructor
@@ -25,7 +25,7 @@ import java.util.UUID;
  *
  * For example:
  * <pre>
- *         public MyPacket(@Nonnull Buffer buffer) {
+ *         public MyPacket(@Nonnull UUID identifier, @Nonnull Buffer buffer) {
  *              ...
  *         }
  * </pre>

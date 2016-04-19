@@ -36,4 +36,13 @@ public interface BroadcastPacket extends Packet {
          */
         @Nonnegative
         short getTimeToLive();
+
+        /**
+         * Sets the maximum amount of hops this packet will live.
+         *
+         * Note: Nodes may impose a limit to the time to live they accept within sane bounds.
+         *
+         * @param ttl a numeric value representing the time to live.
+         */
+        void setTimeToLive(@Nonnegative short ttl);
 }

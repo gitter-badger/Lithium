@@ -22,7 +22,11 @@ import io.netty.buffer.ByteBufAllocator;
 import javax.annotation.Nonnull;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.security.PublicKey;
+import java.security.SignatureException;
+import java.util.UUID;
 
 /**
  * <strong>Node</strong>
@@ -41,7 +45,7 @@ public interface Node {
          * fashion.
          *
          * @param allocator an allocator to utilize for encryption.
-         * @param buffer a buffer.
+         * @param buffer    a buffer.
          * @return an encrypted representation of the buffer.
          *
          * @throws IllegalBlockSizeException when no padding is available for the current encryption method and the data length is not a multiple of the cipher block size.
@@ -50,20 +54,30 @@ public interface Node {
         Buffer encrypt(@Nonnull ByteBufAllocator allocator, @Nonnull Buffer buffer) throws IllegalBlockSizeException, ShortBufferException;
 
         /**
-         * Retrieves a fingerprint which identifies the node as well as its public key.
+         * Retrieves the overall distance between two nodes.
          *
-         * Note: A fingerprint may not be globally unique. This may be caused either due to collisions within the
-         * backing hashing algorithm or due to malicious intend. In those cases we will verify whether a node is who
-         * they claim to be simply by sending them an encrypted message which they will have to decrypt on their own
-         * in order to read it.
-         *
-         * While this may disclose our intention of creating a connection with a certain user, it will not disclose
-         * any detail about the content of our message or our identity.
-         *
-         * @return a fingerprint of the node's public key.
+         * @param node a node.
+         * @return a representation of the overall distance.
          */
         @Nonnull
-        String getFingerprint();
+        BigInteger getDistance(@Nonnull Node node);
+
+        /**
+         * Retrieves the overall distance between two nodes based on their identifier.
+         *
+         * @param identifier an identifier.
+         * @return a representation of the overall distance.
+         */
+        @Nonnull
+        BigInteger getDistance(@Nonnull UUID identifier);
+
+        /**
+         * Retrieves a (hopefully) globally unique identifier which is derived from a node's public key.
+         *
+         * @return an identifier.
+         */
+        @Nonnull
+        UUID getIdentifier();
 
         /**
          * Retrieves the public key which this node currently utilizes for the sake of communication as declared in its
@@ -73,4 +87,26 @@ public interface Node {
          */
         @Nonnull
         PublicKey getPublicKey();
+
+        /**
+         * Converts any UUID into its integer representation.
+         *
+         * @param identifier an identifier.
+         * @return an integer.
+         */
+        @Nonnull
+        static BigInteger toInteger(@Nonnull UUID identifier) {
+                BigInteger integer = new BigInteger(ByteBuffer.allocate(8).putLong(identifier.getMostSignificantBits()).array());
+                integer = integer.shiftLeft(64);
+                return integer.xor(new BigInteger(ByteBuffer.allocate(8).putLong(identifier.getLeastSignificantBits()).array()));
+        }
+
+        /**
+         * Verifies a signature against a node's public key.
+         *
+         * @param data      the data to verify.
+         * @param signature the signature to verify.
+         * @return true if valid, false otherwise.
+         */
+        boolean verify(@Nonnull Buffer data, @Nonnull Buffer signature) throws SignatureException;
 }

@@ -14,18 +14,18 @@ import java.util.UUID;
  *
  * @author <a href="mailto:johannesd@torchmind.com">Johannes Donath</a>
  */
-public class HandshakePacket extends AbstractPacket {
+public class AnnouncementPacket extends AbstractPacket {
         private final String fingerprint;
         private final Version version;
 
-        public HandshakePacket(@Nonnull String fingerprint, @Nonnull Version version) {
+        public AnnouncementPacket(@Nonnull String fingerprint, @Nonnull Version version) {
                 super();
 
                 this.fingerprint = fingerprint;
                 this.version = version;
         }
 
-        public HandshakePacket(@Nonnull UUID identifier, @Nonnull Buffer buffer) {
+        public AnnouncementPacket(@Nonnull UUID identifier, @Nonnull Buffer buffer) {
                 super(identifier);
 
                 this.version = buffer.readStorageValue(Version.class);

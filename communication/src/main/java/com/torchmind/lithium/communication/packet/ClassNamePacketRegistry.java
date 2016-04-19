@@ -23,10 +23,7 @@ import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -193,7 +190,11 @@ class ClassNamePacketRegistry implements PacketRegistry {
                         });
 
                         try {
-                                MethodHandles.publicLookup().findConstructor(type, MethodType.methodType(void.class, Buffer.class));
+                                if (BroadcastPacket.class.isAssignableFrom(type)) {
+                                        MethodHandles.publicLookup().findConstructor(type, MethodType.methodType(void.class, UUID.class, short.class, Buffer.class));
+                                } else {
+                                        MethodHandles.publicLookup().findConstructor(type, MethodType.methodType(void.class, UUID.class, Buffer.class));
+                                }
                         } catch (NoSuchMethodException | IllegalAccessException ex) {
                                 throw new IllegalArgumentException("Cannot register packet type " + type.getName() + ": Cannot access de-serialization constructor", ex);
                         }

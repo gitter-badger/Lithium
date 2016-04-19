@@ -19,6 +19,7 @@ package com.torchmind.lithium.node;
 import com.torchmind.lithium.communication.Buffer;
 import io.netty.buffer.ByteBufAllocator;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
@@ -59,8 +60,8 @@ public interface Node {
          * @param node a node.
          * @return a representation of the overall distance.
          */
-        @Nonnull
-        BigInteger getDistance(@Nonnull Node node);
+        @Nonnegative
+        int getDistance(@Nonnull Node node);
 
         /**
          * Retrieves the overall distance between two nodes based on their identifier.
@@ -68,8 +69,8 @@ public interface Node {
          * @param identifier an identifier.
          * @return a representation of the overall distance.
          */
-        @Nonnull
-        BigInteger getDistance(@Nonnull UUID identifier);
+        @Nonnegative
+        int getDistance(@Nonnull UUID identifier);
 
         /**
          * Retrieves a (hopefully) globally unique identifier which is derived from a node's public key.

@@ -1,5 +1,6 @@
 package com.torchmind.lithium.communication;
 
+import com.torchmind.lithium.communication.packet.Packet;
 import com.torchmind.lithium.communication.storage.StorageValue;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;

@@ -1,8 +1,8 @@
 package com.torchmind.lithium.communication.codec;
 
 import com.torchmind.lithium.communication.Buffer;
-import com.torchmind.lithium.communication.Packet;
-import com.torchmind.lithium.communication.PacketRegistry;
+import com.torchmind.lithium.communication.packet.Packet;
+import com.torchmind.lithium.communication.packet.PacketRegistry;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;

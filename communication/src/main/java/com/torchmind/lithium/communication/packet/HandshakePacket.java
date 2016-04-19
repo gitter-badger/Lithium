@@ -1,7 +1,6 @@
 package com.torchmind.lithium.communication.packet;
 
 import com.torchmind.lithium.communication.Buffer;
-import com.torchmind.lithium.communication.Packet;
 import com.torchmind.lithium.communication.storage.Version;
 
 import javax.annotation.Nonnull;

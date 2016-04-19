@@ -1,4 +1,4 @@
-package com.torchmind.lithium.communication;
+package com.torchmind.lithium.communication.packet;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;

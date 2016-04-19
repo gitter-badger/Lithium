@@ -1,4 +1,6 @@
-package com.torchmind.lithium.communication;
+package com.torchmind.lithium.communication.packet;
+
+import com.torchmind.lithium.communication.Buffer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;

@@ -456,6 +456,13 @@ public interface Buffer {
         Buffer setWriterIndex(int index);
 
         /**
+         * Converts the contents of this buffer into an array of bytes.
+         *
+         * @return an array of bytes.
+         */
+        byte[] toByteArray();
+
+        /**
          * Creates a wrapper around the specified {@link ByteBuf} buffer.
          *
          * @param buffer a buffer to wrap.

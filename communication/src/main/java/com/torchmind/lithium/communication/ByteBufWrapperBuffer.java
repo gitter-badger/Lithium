@@ -442,6 +442,14 @@ class ByteBufWrapperBuffer implements Buffer {
         /**
          * {@inheritDoc}
          */
+        @Override
+        public byte[] toByteArray() {
+                return this.readByteArray(this.getReadableBytes());
+        }
+
+        /**
+         * {@inheritDoc}
+         */
         @Nonnull
         @Override
         public Buffer write(@Nonnull BufferConsumer consumer) throws IOException {

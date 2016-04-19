@@ -10,6 +10,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.PublicKey;
 import java.util.UUID;
 
 /**
@@ -299,6 +300,18 @@ public interface Buffer {
         <P extends Packet> P readPacketData(@Nonnull Class<P> type) throws IllegalArgumentException, IllegalStateException, IndexOutOfBoundsException;
 
         /**
+         * Reads a single public key from the buffer and increases its reader index by the amount required to store its
+         * value as declared in {@link #readByteArray()}.
+         *
+         * @return a reference to the decoded public key.
+         *
+         * @throws IOException               when reading the value fails.
+         * @throws IndexOutOfBoundsException when there is not enough data left within this buffer to de-serialize the supplied storage type.
+         */
+        @Nonnull
+        PublicKey readPublicKey() throws IOException, IndexOutOfBoundsException;
+
+        /**
          * Retrieves a single short from the buffer and increases its reader index by two bytes.
          *
          * @return a short.
@@ -557,6 +570,18 @@ public interface Buffer {
          */
         @Nonnull
         Buffer writePacketData(@Nonnull Packet packet) throws IllegalArgumentException, IOException;
+
+        /**
+         * Writes a single public key into the buffer and increases its writer index by the amount required to store its
+         * value as declared in {@link #writeByteArray(byte[])}.
+         *
+         * This method returns a reference to its parent instance and is thus chain-able.
+         *
+         * @param publicKey a public key.
+         * @return a reference to this buffer.
+         */
+        @Nonnull
+        Buffer writePublicKey(@Nonnull PublicKey publicKey);
 
         /**
          * Writes a single short value into the buffer and increases its writer index by two.

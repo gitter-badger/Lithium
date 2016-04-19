@@ -13,6 +13,11 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.UUID;
 
 /**
@@ -269,6 +274,21 @@ class ByteBufWrapperBuffer implements Buffer {
         /**
          * {@inheritDoc}
          */
+        @Nonnull
+        @Override
+        public PublicKey readPublicKey() throws IOException, IndexOutOfBoundsException {
+                X509EncodedKeySpec keySpec = new X509EncodedKeySpec(this.readByteArray());
+
+                try {
+                        return KeyFactory.getInstance("RSA").generatePublic(keySpec);
+                } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+                        throw new IOException("Cannot decode public key: " + e.getMessage(), e);
+                }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public short readShort() throws IndexOutOfBoundsException {
                 return this.buf.readShort();
@@ -500,6 +520,15 @@ class ByteBufWrapperBuffer implements Buffer {
                 }
 
                 return this.write(packet::write);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        @Override
+        public Buffer writePublicKey(@Nonnull PublicKey publicKey) {
+                return this.writeByteArray((new X509EncodedKeySpec(publicKey.getEncoded())).getEncoded());
         }
 
         /**

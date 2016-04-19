@@ -7,6 +7,18 @@ import javax.annotation.Nonnegative;
  *
  * Represents a packet which has a specific Time-To-Live attached to itself to limit the scope of network flooding.
  *
+ * <strong>Implementation Notes:</strong>
+ * While this interface does not declare any special constructors due to the limitations of the Java programming
+ * language, implementations are required to provide a de-serialization constructor which accepts an instance of
+ * {@link Buffer} as well as a {@link short} value which represents the TTL.
+ *
+ * For example:
+ * <pre>
+ *         public MyPacket(@Nonnegative short ttl, @Nonnull Buffer buffer) {
+ *              ...
+ *         }
+ * </pre>
+ *
  * @author <a href="mailto:johannesd@torchmind.com">Johannes Donath</a>
  */
 public interface BroadcastPacket extends Packet {

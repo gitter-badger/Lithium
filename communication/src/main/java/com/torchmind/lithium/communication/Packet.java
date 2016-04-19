@@ -2,6 +2,7 @@ package com.torchmind.lithium.communication;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * <strong>Packet</strong>
@@ -30,6 +31,17 @@ import java.io.IOException;
  * @author <a href="mailto:johannesd@torchmind.com">Johannes Donath</a>
  */
 public interface Packet {
+
+        /**
+         * Retrieves a globally unique identifier for this packet which helps nodes to decide whether they have already
+         * seen and processed a packet or whether it is new to them.
+         *
+         * This value should be generated upon construction and be final and immutable as of that point.
+         *
+         * @return an identifier.
+         */
+        @Nonnull
+        UUID getIdentifier();
 
         /**
          * Writes the data contained within this representation of a packet into a machine-readable, network suitable

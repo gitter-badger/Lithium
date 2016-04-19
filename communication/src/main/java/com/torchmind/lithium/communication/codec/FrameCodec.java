@@ -18,7 +18,6 @@ package com.torchmind.lithium.communication.codec;
 
 import com.torchmind.lithium.communication.Buffer;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import org.slf4j.Logger;
@@ -36,7 +35,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author <a href="mailto:johannesd@torchmind.com">Johannes Donath</a>
  */
-@ChannelHandler.Sharable
 public class FrameCodec extends ByteToMessageCodec<Buffer> {
         private static final Logger logger = LoggerFactory.getLogger(FrameCodec.class);
         private final AtomicBoolean nativeWarning = new AtomicBoolean(false);

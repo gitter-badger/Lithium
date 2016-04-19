@@ -251,6 +251,7 @@
         <modules>
                 <module>communication</module>
                 <module>node</module>
+                <module>server</module>
         </modules>
 
         <!-- Deployment Profiles -->

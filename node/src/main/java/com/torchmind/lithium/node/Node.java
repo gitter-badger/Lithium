@@ -17,9 +17,11 @@
 package com.torchmind.lithium.node;
 
 import com.torchmind.lithium.communication.Buffer;
+import io.netty.buffer.ByteBufAllocator;
 
 import javax.annotation.Nonnull;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.ShortBufferException;
 import java.security.PublicKey;
 
 /**
@@ -38,13 +40,14 @@ public interface Node {
          * data and should thus only be used for handshaking between two parties which intend to communicate in a secure
          * fashion.
          *
+         * @param allocator an allocator to utilize for encryption.
          * @param buffer a buffer.
          * @return an encrypted representation of the buffer.
          *
          * @throws IllegalBlockSizeException when no padding is available for the current encryption method and the data length is not a multiple of the cipher block size.
          */
         @Nonnull
-        Buffer encrypt(@Nonnull Buffer buffer) throws IllegalBlockSizeException;
+        Buffer encrypt(@Nonnull ByteBufAllocator allocator, @Nonnull Buffer buffer) throws IllegalBlockSizeException, ShortBufferException;
 
         /**
          * Retrieves a fingerprint which identifies the node as well as its public key.

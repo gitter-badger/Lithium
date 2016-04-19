@@ -31,20 +31,6 @@ class ByteBufWrapperBuffer implements Buffer {
         }
 
         /**
-         * Attempts to find a constructor capable of de-serializing broadcast specific packets.
-         *
-         * @param type a packet type.
-         * @return a method handle which represents the de-serialization constructor.
-         *
-         * @throws NoSuchMethodException  when the constructor could not be found.
-         * @throws IllegalAccessException when the constructor is inaccessible.
-         */
-        @Nonnull
-        public MethodHandle getBroadcastDeserializationConstructor(@Nonnull Class<? extends BroadcastPacket> type) throws NoSuchMethodException, IllegalAccessException {
-                return MethodHandles.publicLookup().findConstructor(type, MethodType.methodType(void.class, short.class, Buffer.class));
-        }
-
-        /**
          * {@inheritDoc}
          */
         @Nonnull
@@ -66,6 +52,25 @@ class ByteBufWrapperBuffer implements Buffer {
         @Nonnull
         private MethodHandle getDeserializationConstructor(@Nonnull Class<?> type) throws IllegalAccessException, NoSuchMethodException {
                 return MethodHandles.publicLookup().findConstructor(type, MethodType.methodType(void.class, Buffer.class));
+        }
+
+        /**
+         * Attempts to find the correct packet constructor within the passed packet type implementation and returns it
+         * as a method handle.
+         *
+         * @param type a packet type.
+         * @return a constructor method handle.
+         *
+         * @throws NoSuchMethodException  when the constructor cannot be found.
+         * @throws IllegalAccessException when the constructor is inacessible.
+         */
+        @Nonnull
+        public MethodHandle getPacketConstructor(@Nonnull Class<? extends Packet> type) throws NoSuchMethodException, IllegalAccessException {
+                if (BroadcastPacket.class.isAssignableFrom(type)) {
+                        return MethodHandles.publicLookup().findConstructor(type, MethodType.methodType(void.class, UUID.class, short.class, Buffer.class));
+                }
+
+                return MethodHandles.publicLookup().findConstructor(type, MethodType.methodType(void.class, UUID.class, Buffer.class));
         }
 
         /**
@@ -246,12 +251,13 @@ class ByteBufWrapperBuffer implements Buffer {
         @SuppressWarnings("unchecked")
         public <P extends Packet> P readPacketData(@Nonnull Class<P> type) throws IllegalArgumentException, IllegalStateException, IndexOutOfBoundsException {
                 try {
+                        MethodHandle handle = this.getPacketConstructor(type);
+                        UUID identifier = this.readUUID();
+
                         if (BroadcastPacket.class.isAssignableFrom(type)) {
-                                MethodHandle handle = this.getBroadcastDeserializationConstructor(type.asSubclass(BroadcastPacket.class));
-                                return (P) handle.invokeExact(this.readShort(), this);
+                                return (P) handle.invokeExact(identifier, this.readShort(), this);
                         } else {
-                                MethodHandle handle = this.getDeserializationConstructor(type);
-                                return (P) handle.invokeExact(this);
+                                return (P) handle.invokeExact(identifier, this);
                         }
                 } catch (NoSuchMethodException | IllegalAccessException ex) {
                         throw new IllegalArgumentException("Invalid packet implementation: Could not access de-serialization constructor", ex);
@@ -483,14 +489,14 @@ class ByteBufWrapperBuffer implements Buffer {
         @Override
         public Buffer writePacketData(@Nonnull Packet packet) throws IllegalArgumentException, IOException {
                 try {
-                        if (packet instanceof BroadcastPacket) {
-                                this.getBroadcastDeserializationConstructor(packet.getClass().asSubclass(BroadcastPacket.class));
-                                this.writeShort(((BroadcastPacket) packet).getTimeToLive());
-                        } else {
-                                this.getDeserializationConstructor(packet.getClass());
-                        }
+                        this.getPacketConstructor(packet.getClass());
                 } catch (NoSuchMethodException | IllegalAccessException ex) {
                         throw new IllegalArgumentException("Invalid packet implementation: Could not access de-serialization constructor", ex);
+                }
+
+                this.writeUUID(packet.getIdentifier());
+                if (packet instanceof BroadcastPacket) {
+                        this.writeShort(((BroadcastPacket) packet).getTimeToLive());
                 }
 
                 return this.write(packet::write);

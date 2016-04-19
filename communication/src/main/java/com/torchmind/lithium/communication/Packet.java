@@ -20,6 +20,13 @@ import java.io.IOException;
  * network backend and thus may not call any methods which aren't sufficiently thread safe from within their constructor
  * or {@link #write(Buffer)} method.
  *
+ * For example:
+ * <pre>
+ *         public MyPacket(@Nonnull Buffer buffer) {
+ *              ...
+ *         }
+ * </pre>
+ *
  * @author <a href="mailto:johannesd@torchmind.com">Johannes Donath</a>
  */
 public interface Packet {

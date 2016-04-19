@@ -113,6 +113,12 @@
                                 <artifactId>netty-handler</artifactId>
                                 <version>5.0.0.Alpha2</version>
                         </dependency>
+                        <dependency>
+                                <groupId>io.netty</groupId>
+                                <artifactId>netty-transport-native-epoll</artifactId>
+                                <version>5.0.0.Alpha2</version>
+                                <classifier>${os.detected.classifier}</classifier>
+                        </dependency>
 
                         <!-- Java -->
                         <dependency>
@@ -263,6 +269,14 @@
                                 </plugin>
                         </plugins>
                 </pluginManagement>
+
+                <extensions>
+                        <extension>
+                                <groupId>kr.motd.maven</groupId>
+                                <artifactId>os-maven-plugin</artifactId>
+                                <version>1.5.0.Final</version>
+                        </extension>
+                </extensions>
         </build>
 
         <modules>

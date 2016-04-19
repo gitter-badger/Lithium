@@ -5,6 +5,7 @@ import com.torchmind.lithium.communication.storage.Version;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.security.PublicKey;
 import java.util.UUID;
 
 /**
@@ -15,31 +16,31 @@ import java.util.UUID;
  * @author <a href="mailto:johannesd@torchmind.com">Johannes Donath</a>
  */
 public class AnnouncementPacket extends AbstractPacket {
-        private final String fingerprint;
         private final Version version;
+        private final PublicKey publicKey;
 
-        public AnnouncementPacket(@Nonnull String fingerprint, @Nonnull Version version) {
+        public AnnouncementPacket(@Nonnull Version version, @Nonnull PublicKey publicKey) {
                 super();
 
-                this.fingerprint = fingerprint;
                 this.version = version;
+                this.publicKey = publicKey;
         }
 
-        public AnnouncementPacket(@Nonnull UUID identifier, @Nonnull Buffer buffer) {
+        public AnnouncementPacket(@Nonnull UUID identifier, @Nonnull Buffer buffer) throws IOException {
                 super(identifier);
 
                 this.version = buffer.readStorageValue(Version.class);
-                this.fingerprint = buffer.readString();
-        }
-
-        @Nonnull
-        public String getFingerprint() {
-                return fingerprint;
+                this.publicKey = buffer.readPublicKey();
         }
 
         @Nonnull
         public Version getVersion() {
                 return version;
+        }
+
+        @Nonnull
+        public PublicKey getPublicKey() {
+                return publicKey;
         }
 
         /**
@@ -48,6 +49,6 @@ public class AnnouncementPacket extends AbstractPacket {
         @Override
         public void write(@Nonnull Buffer buffer) throws IOException {
                 buffer.writeStorageValue(this.version)
-                        .writeString(this.fingerprint);
+                        .writePublicKey(this.publicKey);
         }
 }

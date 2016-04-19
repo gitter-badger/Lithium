@@ -17,10 +17,12 @@
 package com.torchmind.lithium.node;
 
 import com.torchmind.lithium.communication.Buffer;
-import com.torchmind.lithium.communication.packet.BroadcastPacket;
+import io.netty.buffer.ByteBufAllocator;
 
 import javax.annotation.Nonnull;
+import javax.crypto.ShortBufferException;
 import java.security.PrivateKey;
+import java.security.SignatureException;
 
 /**
  * <strong>Local Node</strong>
@@ -32,11 +34,22 @@ import java.security.PrivateKey;
 public interface LocalNode extends Node {
 
         /**
-         * Broadcasts a packet to all adjacent nodes within the network.
+         * Decrypts a buffer using the local private key.
          *
-         * @param packet a broadcast packet.
+         * @param allocator an allocator for creating new buffers.
+         * @param buffer    a buffer.
+         * @return a decrypted set of data.
          */
-        void broadcast(@Nonnull BroadcastPacket packet);
+        @Nonnull
+        Buffer decrypt(@Nonnull ByteBufAllocator allocator, @Nonnull Buffer buffer) throws ShortBufferException;
+
+        /**
+         * Retrieves the private key utilized for decryption and creation of signatures by this node.
+         *
+         * @return a private key.
+         */
+        @Nonnull
+        PrivateKey getPrivateKey();
 
         /**
          * Creates a signature for the data contained within the supplied buffer and returns it as a new buffer
@@ -46,22 +59,5 @@ public interface LocalNode extends Node {
          * @return a signature buffer.
          */
         @Nonnull
-        Buffer createSignature(@Nonnull Buffer buffer);
-
-        /**
-         * Decrypts a buffer using the local private key.
-         *
-         * @param buffer a buffer.
-         * @return a decrypted set of data.
-         */
-        @Nonnull
-        Buffer decrypt(@Nonnull Buffer buffer);
-
-        /**
-         * Retrieves the private key utilized for decryption and creation of signatures by this node.
-         *
-         * @return a private key.
-         */
-        @Nonnull
-        PrivateKey getPrivateKey();
+        Buffer sign(@Nonnull Buffer buffer) throws SignatureException;
 }

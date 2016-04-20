@@ -86,9 +86,23 @@ public interface RoutingTable {
          *
          * @param identifier an identifier.
          * @return a request representation.
+         *
          * @see #getNode(UUID) to retrieve a direct reference to the remote node after finalizing the lookup.
          */
+        @Nonnull
         LookupRequest lookupClosestKnownNodes(@Nonnull UUID identifier);
+
+        /**
+         * Attempts to look up a specific unknown node within the network. This method repeats the steps performed by
+         * {@link #lookupClosestKnownNodes(UUID)} until no more steps are possible or until the node is found.
+         *
+         * @param identifier an identifier.
+         * @return a request representation.
+         *
+         * @see #getNode(UUID) to retrieve a direct reference to the remote node after finalizing the lookup.
+         */
+        @Nonnull
+        RecursiveLookupRequest lookupNode(@Nonnull UUID identifier);
 
         /**
          * <strong>Lookup Request</strong>
@@ -210,5 +224,23 @@ public interface RoutingTable {
                  */
                 @Nonnull
                 LookupRequest onSuccess(@Nonnull Consumer<RemoteNode> consumer);
+        }
+
+        /**
+         * <strong>Recursive Lookup Request</strong>
+         *
+         * Provides a representation for recursive lookups which will continue until no further steps towards the target
+         * node are possible.
+         */
+        interface RecursiveLookupRequest extends LookupRequest {
+
+                /**
+                 * Retrieves the absolute amount of iterations which have been successfully performed for this request
+                 * to fulfil it.
+                 *
+                 * @return an amount.
+                 */
+                @Nonnegative
+                int getIterationCount();
         }
 }

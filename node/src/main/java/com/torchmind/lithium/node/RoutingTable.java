@@ -18,6 +18,7 @@ package com.torchmind.lithium.node;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -36,6 +37,7 @@ public interface RoutingTable {
         /**
          * Announces a new remote node to the table and stores it if there is still sufficient storage within its
          * corresponding list.
+         *
          * @param node a node.
          */
         void announce(@Nonnull RemoteNode node);
@@ -83,8 +85,130 @@ public interface RoutingTable {
          * queried.
          *
          * @param identifier an identifier.
-         * @param consumer   a consumer.
+         * @return a request representation.
          * @see #getNode(UUID) to retrieve a direct reference to the remote node after finalizing the lookup.
          */
-        void lookupClosestKnownNodes(@Nonnull UUID identifier, @Nonnull Consumer<Integer> consumer);
+        LookupRequest lookupClosestKnownNodes(@Nonnull UUID identifier);
+
+        /**
+         * <strong>Lookup Request</strong>
+         *
+         * Represents a lookup request along with its timeout and nodes that the request was initially sent to.
+         */
+        interface LookupRequest {
+
+                /**
+                 * Receives a list of nodes which have been discovered in the process.
+                 *
+                 * @return a list of nodes.
+                 */
+                @Nonnull
+                Set<RemoteNode> getDiscoveredNodes();
+
+                /**
+                 * Retrieves the timestamp at which this request is considered expired and the remaining queries are
+                 * considered timed out.
+                 *
+                 * When this timestamp is hit, the data which has been received so far is passed along to the original
+                 * caller and the request is considered fulfilled.
+                 *
+                 * @return a timestamp.
+                 */
+                @Nonnull
+                Instant getExpirationTimestamp();
+
+                /**
+                 * Retrieves a set of fulfilled nodes which have already responded to the request.
+                 *
+                 * @return a set of nodes.
+                 */
+                @Nonnull
+                Set<RemoteNode> getFulfilledNodes();
+
+                /**
+                 * Retrieves a lookup identifier which will be equal on all nodes.
+                 *
+                 * @return an identifier.
+                 */
+                @Nonnull
+                UUID getIdentifier();
+
+                /**
+                 * Retrieves a set of outstanding nodes which have yet to respond to the request.
+                 *
+                 * @return a set of outstanding nodes.
+                 */
+                @Nonnull
+                Set<RemoteNode> getOutstandingNodes();
+
+                /**
+                 * Retrieves a set of nodes which were queried for the sake of this query.
+                 *
+                 * @return a set of queried nodes.
+                 */
+                @Nonnull
+                Set<RemoteNode> getQueriedNodes();
+
+                /**
+                 * Retrieves the original query timestamp.
+                 *
+                 * @return a timestamp.
+                 */
+                @Nonnull
+                Instant getQueryTimestamp();
+
+                /**
+                 * Retrieves the target node identifier which we are currently attempting to find within the network.
+                 *
+                 * @return a target identifier.
+                 */
+                @Nonnull
+                UUID getTargetIdentifier();
+
+                /**
+                 * Retrieves the target node, if it has already been found within this request or an empty optional if
+                 * the target node was not found yet.
+                 *
+                 * @return a target node.
+                 */
+                @Nonnull
+                Optional<RemoteNode> getTargetNode();
+
+                /**
+                 * Checks whether the request has expired before all nodes were able to fulfil it.
+                 *
+                 * @return true if expired, false otherwise.
+                 */
+                boolean hasExpired();
+
+                /**
+                 * Checks whether the request has been fulfilled.
+                 *
+                 * @return true if fulfilled, false otherwise.
+                 */
+                boolean isFulfilled();
+
+                /**
+                 * Registers a callback which is executed when the target node was not found after a request timed out
+                 * or if an exact response for a node was returned.
+                 *
+                 * This method returns a reference to its parent instance and is thus chain-able.
+                 *
+                 * @param consumer a consumer.
+                 * @return a reference to this request.
+                 */
+                @Nonnull
+                LookupRequest onFailure(@Nonnull Consumer<LookupRequest> consumer);
+
+                /**
+                 * Registers a callback which is executed when the target node has been found.
+                 *
+                 * This method returns a reference to its parent instance and is thus chain-able.
+                 *
+                 * @param consumer a consumer.
+                 * @return a reference to this request.
+                 */
+                @Nonnull
+                LookupRequest onSuccess(@Nonnull Consumer<RemoteNode> consumer);
+        }
 }

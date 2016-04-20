@@ -52,6 +52,14 @@ public interface LocalNode extends Node {
         PrivateKey getPrivateKey();
 
         /**
+         * Retrieves a reference to the local routing table which contains a set of discovered nodes.
+         *
+         * @return a routing table.
+         */
+        @Nonnull
+        RoutingTable getRoutingTable();
+
+        /**
          * Creates a signature for the data contained within the supplied buffer and returns it as a new buffer
          * instance.
          *

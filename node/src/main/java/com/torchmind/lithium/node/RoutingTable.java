@@ -34,13 +34,14 @@ import java.util.function.Consumer;
 public interface RoutingTable {
 
         /**
-         * Retrieves the node with the closest distance within the network or, if possible, the searched node itself.
+         * Retrieves the nodes which have the closest distance within the network or, if possible, the searched node
+         * itself.
          *
          * @param identifier an identifier.
          * @return a remote node.
          */
         @Nonnull
-        RemoteNode getClosestNode(@Nonnull UUID identifier);
+        Set<RemoteNode> getClosestNodes(@Nonnull UUID identifier);
 
         /**
          * Searches for a specific node within the local routing table. If no local version of the node was found, an

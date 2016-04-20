@@ -18,7 +18,9 @@ package com.torchmind.lithium.node;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.TemporalUnit;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -77,32 +79,105 @@ public interface RoutingTable {
         Set<RemoteNode> getNodes(@Nonnegative int distance);
 
         /**
-         * Attempts to look up a set of closest known nodes within the network. This step may be repeated until there
-         * are no further nodes to be discovered which are closer to the node in question.
-         *
-         * To be able to resolve the closest node, you will have to call this method all over again until the integer
-         * supplied to the specified consumer is set to zero as this will indicate that no further nodes are to be
-         * queried.
-         *
-         * @param identifier an identifier.
-         * @return a request representation.
-         *
-         * @see #getNode(UUID) to retrieve a direct reference to the remote node after finalizing the lookup.
+         * Creates a new lookup request builder.
+         * @param identifier a node identifier to search for.
+         * @return a request builder.
          */
         @Nonnull
-        LookupRequest lookupClosestKnownNodes(@Nonnull UUID identifier);
+        LookupRequestBuilder lookup(@Nonnull UUID identifier);
 
         /**
-         * Attempts to look up a specific unknown node within the network. This method repeats the steps performed by
-         * {@link #lookupClosestKnownNodes(UUID)} until no more steps are possible or until the node is found.
+         * <strong>Lookup Request Builder</strong>
          *
-         * @param identifier an identifier.
-         * @return a request representation.
-         *
-         * @see #getNode(UUID) to retrieve a direct reference to the remote node after finalizing the lookup.
+         * Provides a factory which is capable of creating and committing lookup requests based on specifications
+         * which have been put in place by invoking a simple natural API.
          */
-        @Nonnull
-        RecursiveLookupRequest lookupNode(@Nonnull UUID identifier);
+        interface LookupRequestBuilder {
+
+                /**
+                 * Creates and submits the request based on the specifications within this builder instance.
+                 * @return a reference to the newly created request.
+                 */
+                @Nonnull
+                LookupRequest commit();
+
+                /**
+                 * Registers a new success callback which will be invoked when a perfect match to the request is
+                 * returned by any of the queried nodes.
+                 *
+                 * This method returns a reference to its parent instance and is thus chain-able.
+                 * @param consumer a callback.
+                 * @return a reference to this builder instance.
+                 */
+                @Nonnull
+                LookupRequestBuilder onSuccess(@Nonnull Consumer<RemoteNode> consumer);
+
+                /**
+                 * Registers a new failure callback which will be invoked when no perfect match to the request is
+                 * returned after all nodes return or after the expiration timeout has been reached.
+                 *
+                 * This method returns a reference to its parent instance and is thus chain-able.
+                 * @param runnable a callback.
+                 * @return a reference to this builder instance.
+                 */
+                @Nonnull
+                LookupRequestBuilder onFailure(@Nonnull Runnable runnable);
+
+                /**
+                 * Marks a request as recursive which will cause it to continue polling new data from the closest set of
+                 * nodes known to the routing table unless either a result is found or no closer nodes are returned.
+                 *
+                 * This method returns a reference to its parent instance and is thus chain-able.
+                 * @return a reference to this builder instance.
+                 */
+                @Nonnull
+                default LookupRequestBuilder recursive() {
+                        return this.recursive(true);
+                }
+
+                /**
+                 * Sets whether the request is recursive which will cause it to continue polling new data from the
+                 * closest set of nodes known to the routing table unless either a result is found or no closer nodes
+                 * are returned.
+                 *
+                 * This method returns a reference to its parent instance and is thus chain-able.
+                 * @param value if true, enables recursive polling, otherwise disables it.
+                 * @return a reference to this builder instance.
+                 */
+                @Nonnull
+                LookupRequestBuilder recursive(boolean value);
+
+                /**
+                 * Sets a specific expiration duration to apply to the requests created by this builder.
+                 *
+                 * This method returns a reference to its parent instance and is thus chain-able.
+                 * @param duration a duration.
+                 * @return a reference to this builder instance.
+                 */
+                @Nonnull
+                LookupRequestBuilder expiration(@Nonnull Duration duration);
+
+                /**
+                 * Sets a specific expiration time to apply to the requests created by this builder.
+                 *
+                 * This method returns a reference to its parent instance and is thus chain-able.
+                 * @param value a time value.
+                 * @param unit a time unit.
+                 * @return a reference to this builder instance.
+                 */
+                @Nonnull
+                LookupRequestBuilder expiration(@Nonnegative long value, @Nonnull TemporalUnit unit);
+
+                /**
+                 * Sets a specific expiration time to apply to the requests created by this builder.
+                 *
+                 * This method returns a reference to its parent instance and is thus chain-able.
+                 * @param timestamp an exact expiration timestamp.
+                 * @return a reference to this builder instance.
+                 */
+                @Nonnull
+                LookupRequestBuilder expiration(Instant timestamp);
+        }
 
         /**
          * <strong>Lookup Request</strong>
@@ -201,46 +276,5 @@ public interface RoutingTable {
                  * @return true if fulfilled, false otherwise.
                  */
                 boolean isFulfilled();
-
-                /**
-                 * Registers a callback which is executed when the target node was not found after a request timed out
-                 * or if an exact response for a node was returned.
-                 *
-                 * This method returns a reference to its parent instance and is thus chain-able.
-                 *
-                 * @param consumer a consumer.
-                 * @return a reference to this request.
-                 */
-                @Nonnull
-                LookupRequest onFailure(@Nonnull Consumer<LookupRequest> consumer);
-
-                /**
-                 * Registers a callback which is executed when the target node has been found.
-                 *
-                 * This method returns a reference to its parent instance and is thus chain-able.
-                 *
-                 * @param consumer a consumer.
-                 * @return a reference to this request.
-                 */
-                @Nonnull
-                LookupRequest onSuccess(@Nonnull Consumer<RemoteNode> consumer);
-        }
-
-        /**
-         * <strong>Recursive Lookup Request</strong>
-         *
-         * Provides a representation for recursive lookups which will continue until no further steps towards the target
-         * node are possible.
-         */
-        interface RecursiveLookupRequest extends LookupRequest {
-
-                /**
-                 * Retrieves the absolute amount of iterations which have been successfully performed for this request
-                 * to fulfil it.
-                 *
-                 * @return an amount.
-                 */
-                @Nonnegative
-                int getIterationCount();
         }
 }

@@ -34,6 +34,13 @@ import java.util.function.Consumer;
 public interface RoutingTable {
 
         /**
+         * Announces a new remote node to the table and stores it if there is still sufficient storage within its
+         * corresponding list.
+         * @param node a node.
+         */
+        void announce(@Nonnull RemoteNode node);
+
+        /**
          * Retrieves the nodes which have the closest distance within the network or, if possible, the searched node
          * itself.
          *
